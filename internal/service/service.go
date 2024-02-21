@@ -31,14 +31,17 @@ func NewBackup() *Backup {
 
 // CreateBackup создает резервную копию согласно конфигурации unit и загружает ее в удаленное хранилище, если remote не равно nil
 func (b *Backup) CreateBackup(unit config.BackupUnitConfig, remote *config.StorageConfig) (*BackupReport, error) {
+	backupReport := &BackupReport{
+		Local:       nil,
+		Remote:      nil,
+		CurrentTime: time.Now().Format("2006-01-02 15:04:05"),
+	}
 	c := &compress.Compress{
 		ArchiveName: unit.Name,
 		InputPaths:  unit.InputPaths,
 		OutputPath:  unit.OutputPath,
 		ExludeFile:  unit.CompressExclude,
 	}
-	var backupReport *BackupReport
-	backupReport.CurrentTime = time.Now().Format("2006-01-02 15:04:05")
 
 	cReport, err := c.Start(unit.CompressFormat)
 	if err != nil {

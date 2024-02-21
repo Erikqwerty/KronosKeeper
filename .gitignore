@@ -6,3 +6,4 @@ tg.conf
 kronoskeeper.toml
 *.old
 .DS_Store
+token.json
