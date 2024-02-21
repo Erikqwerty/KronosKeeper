@@ -137,6 +137,15 @@ func (kkd *KronosKeeperDeamon) handleBackupReport(backupReport *service.BackupRe
 			kkd.writeLogAndNotifyError(err.Error())
 			ERRORS = fmt.Errorf("%v: %v", ERRORS, err) // Добавляем ошибку в общий список ошибок
 		}
+		// Обработка загрузки на Google Drive
+		if backupReport.Remote.GDrive.Status {
+			msg := fmt.Sprintf("%v - Успешная загрузка резервной копии %v на google Drive disk", backupReport.CurrentTime, backupReport.Local.ArchiveName)
+			kkd.writeLogAndNotify(msg)
+		} else if backupReport.Remote.GDrive.Err != nil {
+			err := backupReport.Remote.GCloud.Err
+			kkd.writeLogAndNotifyError(err.Error())
+			ERRORS = fmt.Errorf("%v: %v", ERRORS, err) // Добавляем ошибку в общий список ошибок
+		}
 		// Обработка других удаленных хранилищ
 	}
 

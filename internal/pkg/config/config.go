@@ -12,6 +12,10 @@ type StorageConfig struct {
 	GCloud struct {
 		CredentialsJSON string `toml:"credentials_json"` // Путь к JSON-файлу с учетными данными для Google Cloud
 	} `toml:"gCloud"`
+	GDrive struct {
+		ApiKeyJson string `toml:"apiKeyJson"` // Путь к ключу GDrive для атентификации по OAuth2.0
+		TokenFile  string `toml:"tokenFile"`  // Путь до токен файл где будет сохранен токен после атентификации
+	} `toml:"gDrive"`
 	Samba struct {
 		SambaPath string `toml:"samba"`    // Путь к сетевому ресурсу Samba
 		Username  string `toml:"username"` // Имя пользователя для доступа к ресурсу

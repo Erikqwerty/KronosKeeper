@@ -155,23 +155,23 @@ func (gd *GDrive) printAuthURL() {
 }
 
 // UploadFile загружает файл в Google Drive.
-func (gd *GDrive) UploadFile(filePath string, folderPath string) error {
+func (gd *GDrive) UploadFile(localFilePath string, remoteDir string) error {
 	// Открытие файла для чтения.
-	file, err := os.Open(filePath)
+	file, err := os.Open(localFilePath)
 	if err != nil {
 		return fmt.Errorf("ошибка открытия файла: %v", err)
 	}
 	defer file.Close()
 
 	// Получение или создание папки для загрузки файла.
-	folder, err := gd.getOrCreateFolder(folderPath)
+	folder, err := gd.getOrCreateFolder(remoteDir)
 	if err != nil {
 		return fmt.Errorf("ошибка получения или создания папки: %v", err)
 	}
 
 	// Создание объекта файла для загрузки.
 	f := &drive.File{
-		Title:   filepath.Base(filePath),
+		Title:   filepath.Base(localFilePath),
 		Parents: []*drive.ParentReference{{Id: folder.Id}},
 	}
 

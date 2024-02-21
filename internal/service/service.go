@@ -37,21 +37,26 @@ func (b *Backup) CreateBackup(unit config.BackupUnitConfig, remote *config.Stora
 		OutputPath:  unit.OutputPath,
 		ExludeFile:  unit.CompressExclude,
 	}
-	var pushReport *remotestorage.PushReport
+	var backupReport *BackupReport
+	backupReport.CurrentTime = time.Now().Format("2006-01-02 15:04:05")
 
 	cReport, err := c.Start(unit.CompressFormat)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка при создание архива: текст - %v", err)
 	}
+	backupReport.Local = cReport
 
 	if remote != nil {
-		b.Remotestorage = remotestorage.New(&remotestorage.PushConfig{
-			PushTO:    unit.RemoteStorages,
-			Upload:    filepath.Join(cReport.ArchivePath, cReport.ArchiveName),
-			RemoteDir: filepath.Join(unit.RemoteDir, unit.Name, cReport.YearMoth),
+		b.Remotestorage, err = remotestorage.New(&remotestorage.PushConfig{
+			PushTO:    unit.RemoteStorages,                                        // Передаем в какие удаленные хранилеща делать push
+			Upload:    filepath.Join(cReport.ArchivePath, cReport.ArchiveName),    // указываем путь к архиву и имени архива
+			RemoteDir: filepath.Join(unit.RemoteDir, unit.Name, cReport.YearMoth), // Передаем путь на удаленном хранилище какой должен быть
 		}, remote)
-
-		pushReport = b.PushBackup()
+		if err != nil {
+			return backupReport, err
+		}
+		backupReport.Remote = b.PushBackup()
 	}
-	return &BackupReport{cReport, pushReport, time.Now().Format("2006-01-02 15:04:05")}, nil
+
+	return backupReport, nil
 }

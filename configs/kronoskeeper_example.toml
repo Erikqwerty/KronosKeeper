@@ -8,6 +8,11 @@ log_path = ""       # Путь к файлу журнала configs/kronoskeeper
 #token = ""   # API ключ Telegram (введите ваш собственный ключ)
 #chat_id = ""
 
+[storage]
+[storage.gDrive]
+apiKeyJson = "configs/gDrive.json"
+tokenFile = "configs/token.json"
+
 ### Настройка удаленных хранилищ данных
 #[storage]
 #[storage.gCloud]
