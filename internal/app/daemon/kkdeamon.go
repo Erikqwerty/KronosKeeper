@@ -63,7 +63,7 @@ func (kkd *KronosKeeperDeamon) Start() error {
 			return err
 		}
 	} else {
-		kkd.Logger.Info("Нету не одной задачи резервного копирвоания")
+		kkd.Logger.Info("Нету не одной задачи резервного копирования")
 	}
 
 	return nil
