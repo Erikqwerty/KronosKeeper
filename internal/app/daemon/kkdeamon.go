@@ -58,9 +58,12 @@ func (kkd *KronosKeeperDeamon) Start() error {
 			}
 		}()
 	}
-
-	if err := kkd.addTasksBackup(); err != nil {
-		return err
+	if len(kkd.config.BackupUnits) > 0 {
+		if err := kkd.addTasksBackup(); err != nil {
+			return err
+		}
+	} else {
+		kkd.Logger.Info("Нету не одной задачи резервного копирвоания")
 	}
 
 	return nil
