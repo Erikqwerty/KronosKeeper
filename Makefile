@@ -1,4 +1,4 @@
-.PHONY: build clean run install install-service
+.PHONY: build clean run install install-service install-config
 
 # Цель по умолчанию
 .DEFAULT_GOAL := build
@@ -31,17 +31,17 @@ clean:
 run:
     go run ./cmd/kkdeamon/main.go
 
-# Цель для установки бинарного файла
-install:
+# Цель для установки бинарного файла и конфигурационного файла
+install: install-service install-config
     cp $(BINARY_NAME) $(INSTALL_PATH)/$(BINARY_NAME)
 
 # Цель для установки сервиса systemd
-install-service: install
+install-service:
     cp init/$(BINARY_NAME).service $(SYSTEMD_UNIT_PATH)/$(BINARY_NAME).service
     systemctl daemon-reload
     systemctl enable $(BINARY_NAME)
 
 # Цель для копирования конфигурационного файла
-install-config: install 
+install-config:
     mkdir -p $(CONFIG_DIR)
     cp ./configs/kronoskeeper_example.toml $(CONFIG_DIR)/$(CONFIG_NAME)
