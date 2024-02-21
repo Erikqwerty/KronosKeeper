@@ -1,0 +1,7 @@
+configs/credentials.json
+app
+!app/
+todo.md
+tg.conf
+kronoskeeper.toml
+*.old

@@ -1,0 +1,11 @@
+[Unit]
+Description=KronosKeeper Daemon
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/kkdeamon
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
