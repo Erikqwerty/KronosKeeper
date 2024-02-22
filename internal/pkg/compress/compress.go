@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 )
 
@@ -110,13 +109,13 @@ func (c *Compress) Zip() error {
 	defer zipWriter.Close()
 
 	// Проходимся по директориям, которые нужно добавить в архив
-	for _, dirToBackup := range c.InputPaths {
-		err := filepath.Walk(dirToBackup, func(path string, info fs.FileInfo, err error) error {
+	for _, inputPath := range c.InputPaths {
+		err := filepath.Walk(inputPath, func(path string, info fs.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 			// Добавляем файлы в архив
-			return c.addToZip(path, info, zipWriter, dirToBackup)
+			return c.addToZip(path, info, zipWriter, inputPath)
 		})
 
 		if err != nil {
@@ -128,8 +127,17 @@ func (c *Compress) Zip() error {
 }
 
 // addToZip добавляет файлы и директории в ZIP-архив.
-func (c *Compress) addToZip(path string, info fs.FileInfo, zw *zip.Writer, dirToBackup string) error {
-	// Проверяем, исключен ли файл из архивации
+func (c *Compress) addToZip(path string, info fs.FileInfo, zw *zip.Writer, inputPath string) error {
+	// Получаем относительный путь к файлу
+	relPath, err := filepath.Rel(inputPath, path)
+	if err != nil {
+		return fmt.Errorf("ошибка при получении относительного пути файла: %v", err)
+	}
+
+	// Определяем путь в архиве на основе относительного пути
+	archivePath := filepath.Join(filepath.Base(inputPath), relPath)
+
+	// Исключаем файлы, которые должны быть исключены
 	exclude, err := c.isExcluded(info.Name())
 	if err != nil {
 		return err
@@ -138,40 +146,23 @@ func (c *Compress) addToZip(path string, info fs.FileInfo, zw *zip.Writer, dirTo
 		return nil
 	}
 
-	// Исключаем директорию, если она совпадает с директорией, в которой создаем архив
-	if info.Name() == filepath.Base(c.OutputPath) {
-		return nil
-	}
-
-	// Получаем метаданные файла для архива
-	fileHeader, err := zip.FileInfoHeader(info)
-	if err != nil {
-		return fmt.Errorf("ошибка при получении метаданных файла: %v", err)
-	}
-
-	// Получаем относительный путь к файлу
-	fileHeader.Name, err = filepath.Rel(dirToBackup, path)
-	if err != nil {
-		return fmt.Errorf("ошибка при получении относительного пути файла: %v", err)
-	}
-
-	// Убираем регистр из пути
-	fileHeader.Name = strings.ToLower(fileHeader.Name)
-
-	// Если это директория, добавляем "/" к имени файла
-	if info.IsDir() {
-		fileHeader.Name += "/"
-	}
-
 	// Создаем запись в ZIP-архиве
-	ArchiveWriter, err := zw.CreateHeader(fileHeader)
+	var archiveWriter io.Writer
+	if info.IsDir() {
+		// Если это директория, добавляем "/" к пути в архиве
+		archivePath += "/"
+		archiveWriter, err = zw.Create(archivePath)
+	} else {
+		// Если это файл, создаем запись с путем в архиве
+		archiveWriter, err = zw.Create(filepath.ToSlash(archivePath))
+	}
 	if err != nil {
 		return fmt.Errorf("ошибка при создании записи в архиве: %v", err)
 	}
 
 	// Если это не директория, копируем содержимое файла в архив
 	if !info.IsDir() {
-		return c.writeToArchive(ArchiveWriter, path)
+		return c.writeToArchive(archiveWriter, path)
 	}
 
 	return nil
