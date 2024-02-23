@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
-	"github.com/BurntSushi/toml"
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/config"
 )
 
@@ -18,10 +18,10 @@ func init() {
 
 func main() {
 	flag.Parse()
-	conf := config.NewConfig()
-	_, err := toml.DecodeFile(configPath, conf) // загружаем конфигурацию из файла toml в config
+	conf, err := config.NewConfig(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(conf)
 
 }

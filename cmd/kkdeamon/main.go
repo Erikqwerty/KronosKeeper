@@ -2,15 +2,13 @@ package main
 
 import (
 	"flag"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/BurntSushi/toml"
-
 	"github.com/Erikqwerty/KronosKeeper/internal/app/daemon"
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/config"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -24,10 +22,9 @@ func init() {
 func main() {
 	flag.Parse()
 
-	conf := config.NewConfig()
-	_, err := toml.DecodeFile(configPath, conf) // загружаем конфигурацию из файла toml в config
+	conf, err := config.NewConfig(configPath)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	kkd := daemon.New(conf)
@@ -38,7 +35,7 @@ func main() {
 
 	// Запускаем демона
 	if err := kkd.Start(); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	// Ожидаем сигнала завершения работы

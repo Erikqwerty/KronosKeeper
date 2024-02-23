@@ -1,6 +1,10 @@
 // Пакет config содержит структуры для конфигурации приложения KronosKeeper.
 package config
 
+import (
+	"github.com/BurntSushi/toml"
+)
+
 // Telegram представляет настройки уведомлений для Telegram.
 type Telegram struct {
 	Token  string `toml:"token"`   // API ключ Telegram
@@ -51,9 +55,12 @@ type Config struct {
 }
 
 // NewConfig создает новый экземпляр конфигурации KronosKeeper.
-func NewConfig() *Config {
-	return &Config{
-		LogPath:  "",
-		LogLevel: "",
+func NewConfig(configPath string) (*Config, error) {
+	conf := &Config{}
+	_, err := toml.DecodeFile(configPath, conf) // загружаем конфигурацию из файла toml в config
+	if err != nil {
+		return nil, err
 	}
+
+	return conf, nil
 }
