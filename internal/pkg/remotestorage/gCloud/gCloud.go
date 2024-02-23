@@ -37,29 +37,29 @@ func (gc *GCloud) NewClient() error {
 }
 
 // UploadFile загружает файл на Google Cloud в указанную удаленную директорию.
-func (gc *GCloud) UploadFile(localFilePath, remoteDir string) error {
+func (gc *GCloud) UploadFile(localPath, remotePath string) error {
 	// Открываем локальный файл для чтения.
-	file, err := os.Open(localFilePath)
+	file, err := os.Open(localPath)
 	if err != nil {
 		return fmt.Errorf("не удалось открыть файл для чтения: %v", err)
 	}
 	defer file.Close()
 
 	// Создаем директории на Google Cloud, если они не существуют.
-	if err := gc.ensureDirectoriesExist(remoteDir); err != nil {
+	if err := gc.ensureDirectoriesExist(remotePath); err != nil {
 		return err
 	}
 
 	// Получаем идентификатор директории на Google Cloud, куда будем загружать файл.
-	remoteDirID, err := gc.getFolderIDByPath(remoteDir)
+	gCloudfolderID, err := gc.folderIDByPath(remotePath)
 	if err != nil {
 		return err
 	}
 
 	// Создаем метаданные для файла.
 	fileMetadata := &drive.File{
-		Name:    filepath.Base(localFilePath),
-		Parents: []string{remoteDirID},
+		Name:    filepath.Base(localPath),
+		Parents: []string{gCloudfolderID},
 	}
 
 	// Загружаем файл на Google Cloud.
@@ -72,17 +72,17 @@ func (gc *GCloud) UploadFile(localFilePath, remoteDir string) error {
 }
 
 // ensureDirectoriesExist создает необходимые директории на Google Cloud для заданного пути.
-func (gc *GCloud) ensureDirectoriesExist(remoteDir string) error {
+func (gc *GCloud) ensureDirectoriesExist(remotePath string) error {
 	// Разделяем путь на отдельные компоненты.
-	folderNames := strings.Split(remoteDir, "/")
+	pathСomponents := strings.Split(remotePath, "/")
 
 	// Начинаем с корневой папки Google Cloud.
 	parentID := "root"
 
 	// Перебираем каждый компонент пути.
-	for _, folderName := range folderNames {
+	for _, folderName := range pathСomponents {
 		// Проверяем, существует ли папка с текущим именем в текущей родительской папке.
-		folderID, err := gc.getFolderIDByNameAndParentID(folderName, parentID)
+		folderID, err := gc.folderID(folderName, parentID)
 		if err != nil {
 			return fmt.Errorf("не удалось получить идентификатор папки %s: %v", folderName, err)
 		}
@@ -103,8 +103,8 @@ func (gc *GCloud) ensureDirectoriesExist(remoteDir string) error {
 	return nil
 }
 
-// getFolderIDByNameAndParentID возвращает идентификатор папки по ее имени и родительскому идентификатору.
-func (gc *GCloud) getFolderIDByNameAndParentID(folderName, parentID string) (string, error) {
+// folderID возвращает идентификатор папки по ее имени и родительскому идентификатору.
+func (gc *GCloud) folderID(folderName, parentID string) (string, error) {
 	query := fmt.Sprintf("mimeType='application/vnd.google-apps.folder' and name='%s' and '%s' in parents", folderName, parentID)
 	fileList, err := gc.client.Files.List().Q(query).Fields("files(id)").Do()
 	if err != nil {
@@ -127,16 +127,16 @@ func (gc *GCloud) createFolder(folderName, parentID string) (*drive.File, error)
 	return gc.client.Files.Create(folder).Do()
 }
 
-// getFolderIDByPath возвращает идентификатор папки на Google Cloud по ее пути.
-func (gc *GCloud) getFolderIDByPath(folderPath string) (string, error) {
+// folderIDByPath возвращает идентификатор папки на Google Cloud по ее пути.
+func (gc *GCloud) folderIDByPath(remotePath string) (string, error) {
 	// Разделяем путь на отдельные компоненты.
-	folderNames := strings.Split(folderPath, "/")
+	pathСomponents := strings.Split(remotePath, "/")
 
 	// Начинаем с корневой папки Google Cloud.
 	parentID := "root"
 
 	// Перебираем каждый компонент пути.
-	for _, folderName := range folderNames {
+	for _, folderName := range pathСomponents {
 		// Выполняем запрос к Google Cloud API для получения списка папок в текущей родительской папке.
 		fileList, err := gc.client.Files.List().Q(fmt.Sprintf("'%s' in parents and mimeType='application/vnd.google-apps.folder' and name='%s'", parentID, folderName)).Do()
 		if err != nil {
@@ -156,12 +156,12 @@ func (gc *GCloud) getFolderIDByPath(folderPath string) (string, error) {
 	return parentID, nil
 }
 
-// ListFilesAndFolders возвращает список файлов и папок в указанной папке на Google Cloud.
-func (gc *GCloud) ListFilesAndFolders(folderPath string) ([]*drive.File, error) {
+// ListDirItems возвращает список файлов и папок в указанной папке на Google Cloud.
+func (gc *GCloud) ListDirItems(remotePath string) ([]*drive.File, error) {
 	// Получаем идентификатор папки по ее пути.
-	folderID, err := gc.getFolderIDByPath(folderPath)
+	folderID, err := gc.folderIDByPath(remotePath)
 	if err != nil {
-		return nil, fmt.Errorf("не удалось получить идентификатор папки по пути %s: %v", folderPath, err)
+		return nil, fmt.Errorf("не удалось получить идентификатор папки по пути %s: %v", remotePath, err)
 	}
 
 	// Выполняем запрос к Google Cloud API для получения списка файлов и папок в указанной папке.
