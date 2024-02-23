@@ -32,6 +32,8 @@ systemctl status kkdeamon
 
 Для работы с Google Cloud требуется файл `credentials.json`, который можно создать на [сайте Google Cloud](https://cloud.google.com).
 
+Для работы с Google Drive, нужно перейти по ссылке в консоли после первого запуска и пройти атентификацию на своем google диске.
+
 Для работы с Telegram необходим токен (получаем у BotFather) и ваш ID, который можно узнать у [userinfobot](https://t.me/userinfobot).
 
 Формат сжатия: только zip.
@@ -52,6 +54,11 @@ chat_id = ""         # ID чата в телеграм, используйте u
 [storage.gCloud]
 credentials_json = "configs/credentials.json"  # Путь к JSON-файлу с учетными данными для Google Cloud
 
+[storage.gDrive]
+apiKeyJson = "/etc/KronosKeeper/gDrive.json" # Ключ для использования протокола oauth2.0 для работы с google drive аутентификацией, не меняйте параментр если не имеете своего ключа.
+tokenFile = "/etc/KronosKeeper/token.json" # Путь к токену который будет создан после первой атентификации в приложение
+
+
 ### Настройка юнитов/задач бекапов
 [[Unit]]
 name = "nginx"        # Имя юнита/задачи бэкапа
@@ -60,7 +67,7 @@ input = ["/tmp/test"]  # Пути для бэкапа
 output = "/tmp"        # Путь для сохранения бэкапов
 compressFormat = "zip"  # Формат сжатия бэкапов
 compressExclude = ["file1", "*.zip"]  # Исключения из сжатия
-remotestorages = ["gCloud"]  # Список удаленных хранилищ, куда отправлять бэкапы
+remotestorages = ["gCloud", "gDrive"]  # Список удаленных хранилищ, куда отправлять бэкапы
 remoteDir = "hostnamemyserver"  # Папка на удаленном хранилище для сохранения бэкапов
 ```
 

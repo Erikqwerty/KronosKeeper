@@ -103,6 +103,7 @@ func (r *Remotestorage) PushBackup() *PushReport {
 				continue
 			}
 			pushReport.GCloud.Status = true
+
 		case "gDrive":
 			if err := r.gDrive.NewClient(); err != nil {
 				pushReport.GDrive.Err = fmt.Errorf("ошибка создания клиента: %v", err)
@@ -111,7 +112,9 @@ func (r *Remotestorage) PushBackup() *PushReport {
 				pushReport.GDrive.Err = fmt.Errorf("ошибка загрузки файла: %v", err)
 			}
 			pushReport.GDrive.Status = true
+
 		}
 	}
+
 	return pushReport
 }

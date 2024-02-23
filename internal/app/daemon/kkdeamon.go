@@ -130,7 +130,7 @@ func (kkd *KronosKeeperDeamon) handleBackupReport(backupReport *service.BackupRe
 	if backupReport.Remote != nil {
 		// Обработка загрузки на Google Cloud
 		if backupReport.Remote.GCloud.Status {
-			msg := fmt.Sprintf("%v - Успешная загрузка резервной копии %v на google cloud disk", backupReport.CurrentTime, backupReport.Local.ArchiveName)
+			msg := fmt.Sprintf("%v - Успешная загрузка резервной копии %v на google Cloud disk", backupReport.CurrentTime, backupReport.Local.ArchiveName)
 			kkd.writeLogAndNotify(msg)
 		} else if backupReport.Remote.GCloud.Err != nil {
 			err := backupReport.Remote.GCloud.Err

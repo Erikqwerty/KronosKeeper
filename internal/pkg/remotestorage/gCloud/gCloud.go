@@ -1,5 +1,3 @@
-// Пакет gcloud предоставляет функциональность для взаимодействия с Google Cloud Disk API,
-// такую как загрузка файлов, создание папок и получение списка файлов и папок.
 package gCloud
 
 import (
@@ -53,17 +51,15 @@ func (gc *GCloud) UploadFile(localFilePath, remoteDir string) error {
 	}
 
 	// Получаем идентификатор директории на Google Cloud, куда будем загружать файл.
-	remoteDir, err = gc.getFolderIDByPath(remoteDir)
+	remoteDirID, err := gc.getFolderIDByPath(remoteDir)
 	if err != nil {
 		return err
 	}
 
 	// Создаем метаданные для файла.
 	fileMetadata := &drive.File{
-		Name: filepath.Base(localFilePath),
-		Parents: []string{
-			remoteDir,
-		},
+		Name:    filepath.Base(localFilePath),
+		Parents: []string{remoteDirID},
 	}
 
 	// Загружаем файл на Google Cloud.
@@ -78,7 +74,7 @@ func (gc *GCloud) UploadFile(localFilePath, remoteDir string) error {
 // ensureDirectoriesExist создает необходимые директории на Google Cloud для заданного пути.
 func (gc *GCloud) ensureDirectoriesExist(remoteDir string) error {
 	// Разделяем путь на отдельные компоненты.
-	folderNames := filepath.SplitList(remoteDir)
+	folderNames := strings.Split(remoteDir, "/")
 
 	// Начинаем с корневой папки Google Cloud.
 	parentID := "root"
