@@ -79,7 +79,7 @@ func (kkd *KronosKeeperDeamon) Stop() error {
 func (kkd *KronosKeeperDeamon) addTasksBackup() error {
 	for _, unit := range kkd.config.BackupUnits {
 		err := kkd.AddTask(unit.CrontabTask, func() {
-			backupReport, err := kkd.CreateBackup(unit, kkd.config.Storage)
+			backupReport, err := kkd.CreateBackup(unit, kkd.config.RemoteStorages)
 			if err != nil {
 				kkd.writeLogAndNotifyError(fmt.Sprintf("Ошибка при запуске создания резервной копии для Unit %v: %v", unit.Name, err))
 			}

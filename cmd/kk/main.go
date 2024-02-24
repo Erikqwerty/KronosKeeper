@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 
+	"github.com/Erikqwerty/KronosKeeper/internal/app/manager"
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/config"
 )
 
@@ -22,6 +22,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(conf)
-
+	kkmanager, err := manager.New(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = kkmanager.GDrive.NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	kkmanager.ListDir(kkmanager.RemoteStorage.GDrive, "nginx")
 }

@@ -19,8 +19,8 @@ type Backup struct {
 
 // BackupReport содержит отчет о создании резервной копии
 type BackupReport struct {
-	Local       *compress.CompressReport
-	Remote      *remotestorages.UploadReports
+	Local       *compress.CompressReport      // отчет о локальное резервной копии
+	Remote      *remotestorages.UploadReports // отчет о загрузки в удаленные хранилеща
 	CurrentTime string
 }
 
@@ -30,7 +30,7 @@ func NewBackup() *Backup {
 }
 
 // CreateBackup создает резервную копию согласно конфигурации unit и загружает ее в удаленное хранилище, если remote не равно nil
-func (b *Backup) CreateBackup(unit config.BackupUnitConfig, remote *config.StorageConfig) (*BackupReport, error) {
+func (b *Backup) CreateBackup(unit config.BackupUnit, remote *config.RemoteStorages) (*BackupReport, error) {
 	backupReport := &BackupReport{
 		Local:       nil,
 		Remote:      nil,

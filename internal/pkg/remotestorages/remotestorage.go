@@ -9,6 +9,7 @@ import (
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorages/nfs"
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorages/samba"
 	gdrive "github.com/Erikqwerty/KronosKeeper/pkg/gDrive"
+	"google.golang.org/api/drive/v2"
 )
 
 // Remotestorages представляет собой структуру для работы с удаленными хранилищами.
@@ -18,6 +19,11 @@ type Remotestorages struct {
 	gDrive *gdrive.GDrive
 	smb    *samba.Samba
 	nfs    *nfs.NFS
+}
+
+type Remoter interface {
+	UploadFile(string, string) error
+	ListDirItems(string) ([]*drive.File, error)
 }
 
 // UploadConfig содержит настройки для отправки резервных копий в удаленное хранилище.
@@ -70,7 +76,7 @@ func NewReports() *UploadReports {
 }
 
 // New создает новый объект Remotestorages на основе конфигурации.
-func New(UploadConfig *UploadConfig, remote *config.StorageConfig) (*Remotestorages, error) {
+func New(UploadConfig *UploadConfig, remote *config.RemoteStorages) (*Remotestorages, error) {
 	remotestorages := &Remotestorages{
 		UploadConfig: *UploadConfig,
 		gCloud:       gCloud.New(remote.GCloud.CredentialsJSON),

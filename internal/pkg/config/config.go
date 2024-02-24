@@ -11,8 +11,8 @@ type Telegram struct {
 	ChatID string `toml:"chat_id"` // id чата
 }
 
-// StorageConfig содержит настройки удаленных хранилищ данных.
-type StorageConfig struct {
+// RemoteStorages содержит настройки удаленных хранилищ данных.
+type RemoteStorages struct {
 	GCloud struct {
 		CredentialsJSON string `toml:"credentials_json"` // Путь к JSON-файлу с учетными данными для Google Cloud
 	} `toml:"gCloud"`
@@ -32,7 +32,7 @@ type StorageConfig struct {
 }
 
 // BackupUnitConfig содержит настройки юнитов/задач бекапов.
-type BackupUnitConfig struct {
+type BackupUnit struct {
 	Name            string   `toml:"name"`            // Имя юнита/задачи бэкапа
 	Retention       int      `toml:"retention"`       // Время хранения бэкапов (в днях)
 	CrontabTask     string   `toml:"crontabTask"`     // Расписание Cron
@@ -47,11 +47,11 @@ type BackupUnitConfig struct {
 
 // Config представляет конфигурацию программы KronosKeeper.
 type Config struct {
-	LogPath     string             `toml:"log_path"`  // Путь к файлу журнала
-	LogLevel    string             `toml:"log_level"` // Уровень журналирования
-	Telegram    *Telegram          `toml:"telegram"`  // Настройки уведомлений
-	Storage     *StorageConfig     `toml:"storage"`   // Настройки удаленных хранилищ данных
-	BackupUnits []BackupUnitConfig `toml:"unit"`      // Настройки юнитов/задач бекапов
+	LogPath        string          `toml:"log_path"`  // Путь к файлу журнала
+	LogLevel       string          `toml:"log_level"` // Уровень журналирования
+	Telegram       *Telegram       `toml:"telegram"`  // Настройки уведомлений
+	RemoteStorages *RemoteStorages `toml:"storage"`   // Настройки удаленных хранилищ данных
+	BackupUnits    []BackupUnit    `toml:"unit"`      // Настройки юнитов/задач бекапов
 }
 
 // NewConfig создает новый экземпляр конфигурации KronosKeeper.

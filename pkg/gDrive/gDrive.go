@@ -210,8 +210,8 @@ func (gd *GDrive) DownloadFile(fileID string, localPath string) error {
 	return nil
 }
 
-// LS выводит список файлов в указанной папке.
-func (gd *GDrive) LS(remotePath string) error {
+// ListDirItems выводит список файлов в указанной папке.
+func (gd *GDrive) ListDirItems(remotePath string) ([]*drive.File, error) {
 	// Если путь пустой, устанавливаем его как корневая папка.
 	if remotePath == "" {
 		remotePath = "root"
@@ -220,22 +220,17 @@ func (gd *GDrive) LS(remotePath string) error {
 	// Получение ID папки по ее пути.
 	folder, err := gd.getFolderByPath(remotePath)
 	if err != nil {
-		return fmt.Errorf("ошибка получения папки: %v", err)
+		return nil, fmt.Errorf("ошибка получения папки: %v", err)
 	}
 
 	// Формирование запроса к API для получения списка файлов в указанной папке.
 	query := fmt.Sprintf("'%s' in parents", folder.Id)
 	files, err := gd.service.Files.List().Q(query).Do()
 	if err != nil {
-		return fmt.Errorf("ошибка при получении списка файлов: %v", err)
+		return nil, fmt.Errorf("ошибка при получении списка файлов: %v", err)
 	}
 
-	// Вывод списка файлов.
-	fmt.Printf("Список файлов в папке %s:\n", remotePath)
-	for _, file := range files.Items {
-		fmt.Printf("ID: %s, Name: %s\n", file.Id, file.Title)
-	}
-	return nil
+	return files.Items, err
 }
 
 // getOrCreateFolder получает или создает папку по указанному пути.

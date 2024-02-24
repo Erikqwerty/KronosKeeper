@@ -27,7 +27,7 @@ func (tr *TaskRunner) ListTasks() []*cron.Entry {
 	return tr.cron.Entries()
 }
 
-func (tr *TaskRunner) AddTaskS(units *[]config.BackupUnitConfig) {
+func (tr *TaskRunner) AddTaskS(units *[]config.BackupUnit) {
 
 }
 
