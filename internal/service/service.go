@@ -8,19 +8,19 @@ import (
 
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/compress"
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/config"
-	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorage"
+	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorages"
 )
 
 // Backup представляет собой структуру, объединяющую компрессию и удаленное хранилище
 type Backup struct {
 	*compress.Compress
-	*remotestorage.Remotestorage
+	*remotestorages.Remotestorages
 }
 
 // BackupReport содержит отчет о создании резервной копии
 type BackupReport struct {
 	Local       *compress.CompressReport
-	Remote      *remotestorage.PushReport
+	Remote      *remotestorages.UploadReports
 	CurrentTime string
 }
 
@@ -45,20 +45,20 @@ func (b *Backup) CreateBackup(unit config.BackupUnitConfig, remote *config.Stora
 
 	cReport, err := c.Start(unit.CompressFormat)
 	if err != nil {
-		return nil, fmt.Errorf("ошибка при создание архива: текст - %v", err)
+		return nil, fmt.Errorf("CreateBackup, ошибка при создание архива, текст: %v", err)
 	}
 	backupReport.Local = cReport
 
 	if remote != nil {
-		b.Remotestorage, err = remotestorage.New(&remotestorage.PushConfig{
-			PushTO:    unit.RemoteStorages,                                        // Передаем в какие удаленные хранилеща делать push
-			Upload:    filepath.Join(cReport.ArchivePath, cReport.ArchiveName),    // указываем путь к архиву и имени архива
-			RemoteDir: filepath.Join(unit.RemoteDir, unit.Name, cReport.YearMoth), // Передаем путь на удаленном хранилище какой должен быть
+		b.Remotestorages, err = remotestorages.New(&remotestorages.UploadConfig{
+			UploadTO:   unit.UploadTo,                                               // Передаем в какие удаленные хранилеща делать push
+			LocalPath:  filepath.Join(cReport.ArchivePath, cReport.ArchiveName),     // указываем путь к архиву и имени архива
+			RemotePath: filepath.Join(unit.RemotePath, unit.Name, cReport.YearMoth), // Передаем путь на удаленном хранилище какой должен быть
 		}, remote)
 		if err != nil {
 			return backupReport, err
 		}
-		backupReport.Remote = b.PushBackup()
+		backupReport.Remote = b.UploadBackups()
 	}
 
 	return backupReport, nil

@@ -63,12 +63,12 @@ tokenFile = "/etc/KronosKeeper/token.json" # Путь к токену котор
 [[Unit]]
 name = "nginx"        # Имя юнита/задачи бэкапа
 crontabTask = "* * * * * *"  # Расписание Cron 
-input = ["/tmp/test"]  # Пути для бэкапа
+inputPaths = ["/tmp/test"]  # Пути для бэкапа
 output = "/tmp"        # Путь для сохранения бэкапов
 compressFormat = "zip"  # Формат сжатия бэкапов
 compressExclude = ["file1", "*.zip"]  # Исключения из сжатия
-remotestorages = ["gCloud", "gDrive"]  # Список удаленных хранилищ, куда отправлять бэкапы
-remoteDir = "hostnamemyserver"  # Папка на удаленном хранилище для сохранения бэкапов
+uploadTo = ["gCloud", "gDrive"]  # Список удаленных хранилищ, куда отправлять бэкапы
+remotePath = "hostnamemyserver"  # Папка на удаленном хранилище для сохранения бэкапов
 ```
 
 ### Структура папок для каждого юнита бекапа

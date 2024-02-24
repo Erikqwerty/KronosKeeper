@@ -30,7 +30,7 @@ func New(credentialsJSON string) *GCloud {
 func (gc *GCloud) NewClient() error {
 	client, err := drive.NewService(gc.ctx, option.WithCredentialsFile(gc.CredentialsJSON))
 	if err != nil {
-		return fmt.Errorf("не удалось создать клиент Google Cloud API: %v", err)
+		return fmt.Errorf("google Cloud API NewClient: не удалось создать клиент: %v", err)
 	}
 	gc.client = client
 	return nil
@@ -65,7 +65,7 @@ func (gc *GCloud) UploadFile(localPath, remotePath string) error {
 	// Загружаем файл на Google Cloud.
 	_, err = gc.client.Files.Create(fileMetadata).Media(file).Do()
 	if err != nil {
-		return fmt.Errorf("не удалось загрузить файл: %v", err)
+		return fmt.Errorf("google Cloud API Upload: не удалось загрузить файл: %v", err)
 	}
 
 	return nil
@@ -84,14 +84,14 @@ func (gc *GCloud) ensureDirectoriesExist(remotePath string) error {
 		// Проверяем, существует ли папка с текущим именем в текущей родительской папке.
 		folderID, err := gc.folderID(folderName, parentID)
 		if err != nil {
-			return fmt.Errorf("не удалось получить идентификатор папки %s: %v", folderName, err)
+			return fmt.Errorf("google Cloud API: не удалось получить идентификатор папки %s: %v", folderName, err)
 		}
 
 		// Если папка не существует, создаем ее.
 		if folderID == "" {
 			newFolder, err := gc.createFolder(folderName, parentID)
 			if err != nil {
-				return fmt.Errorf("не удалось создать папку %s: %v", folderName, err)
+				return fmt.Errorf("google Cloud API: не удалось создать папку %s: %v", folderName, err)
 			}
 			parentID = newFolder.Id
 		} else {
@@ -140,12 +140,12 @@ func (gc *GCloud) folderIDByPath(remotePath string) (string, error) {
 		// Выполняем запрос к Google Cloud API для получения списка папок в текущей родительской папке.
 		fileList, err := gc.client.Files.List().Q(fmt.Sprintf("'%s' in parents and mimeType='application/vnd.google-apps.folder' and name='%s'", parentID, folderName)).Do()
 		if err != nil {
-			return "", fmt.Errorf("не удалось получить список папок: %v", err)
+			return "", fmt.Errorf("google Cloud API: не удалось получить список папок: %v", err)
 		}
 
 		// Проверяем, найдена ли папка с заданным именем в текущей родительской папке.
 		if len(fileList.Files) == 0 {
-			return "", fmt.Errorf("папка '%s' не найдена в родительской папке с идентификатором '%s'", folderName, parentID)
+			return "", fmt.Errorf("google Cloud API: папка '%s' не найдена в родительской папке с идентификатором '%s'", folderName, parentID)
 		}
 
 		// Получаем идентификатор найденной папки.
@@ -161,13 +161,13 @@ func (gc *GCloud) ListDirItems(remotePath string) ([]*drive.File, error) {
 	// Получаем идентификатор папки по ее пути.
 	folderID, err := gc.folderIDByPath(remotePath)
 	if err != nil {
-		return nil, fmt.Errorf("не удалось получить идентификатор папки по пути %s: %v", remotePath, err)
+		return nil, fmt.Errorf("google Cloud API: не удалось получить идентификатор папки по пути %s: %v", remotePath, err)
 	}
 
 	// Выполняем запрос к Google Cloud API для получения списка файлов и папок в указанной папке.
 	fileList, err := gc.client.Files.List().Q(fmt.Sprintf("'%s' in parents", folderID)).Do()
 	if err != nil {
-		return nil, fmt.Errorf("не удалось получить список файлов и папок: %v", err)
+		return nil, fmt.Errorf("google Cloud API: не удалось получить список файлов и папок: %v", err)
 	}
 
 	// Возвращаем список файлов и папок.

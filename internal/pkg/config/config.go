@@ -36,13 +36,13 @@ type BackupUnitConfig struct {
 	Name            string   `toml:"name"`            // Имя юнита/задачи бэкапа
 	Retention       int      `toml:"retention"`       // Время хранения бэкапов (в днях)
 	CrontabTask     string   `toml:"crontabTask"`     // Расписание Cron
-	InputPaths      []string `toml:"input"`           // Пути для бэкапа
+	InputPaths      []string `toml:"inputPaths"`      // Пути для бэкапа
 	OutputPath      string   `toml:"output"`          // Путь для сохранения бэкапов
 	CompressFormat  string   `toml:"compressFormat"`  // Формат сжатия бэкапов
 	CompressExclude []string `toml:"compressExclude"` // Исключения из сжатия
 	MaxDiskUsage    string   `toml:"maxDiskUsage"`    // Максимальное использование диска
-	RemoteStorages  []string `toml:"remotestorages"`  // Список удаленных хранилищ
-	RemoteDir       string   `toml:"remoteDir"`       // Папка на удаленном хранилище для сохранения бэкапов
+	UploadTo        []string `toml:"uploadTo"`        // Список удаленных хранилищ
+	RemotePath      string   `toml:"remotePath"`      // Папка на удаленном хранилище для сохранения бэкапов
 }
 
 // Config представляет конфигурацию программы KronosKeeper.

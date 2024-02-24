@@ -155,23 +155,23 @@ func (gd *GDrive) printAuthURL() {
 }
 
 // UploadFile загружает файл в Google Drive.
-func (gd *GDrive) UploadFile(localFilePath string, remoteDir string) error {
+func (gd *GDrive) UploadFile(localPath string, remotePath string) error {
 	// Открытие файла для чтения.
-	file, err := os.Open(localFilePath)
+	file, err := os.Open(localPath)
 	if err != nil {
 		return fmt.Errorf("ошибка открытия файла: %v", err)
 	}
 	defer file.Close()
 
 	// Получение или создание папки для загрузки файла.
-	folder, err := gd.getOrCreateFolder(remoteDir)
+	folder, err := gd.getOrCreateFolder(remotePath)
 	if err != nil {
 		return fmt.Errorf("ошибка получения или создания папки: %v", err)
 	}
 
 	// Создание объекта файла для загрузки.
 	f := &drive.File{
-		Title:   filepath.Base(localFilePath),
+		Title:   filepath.Base(localPath),
 		Parents: []*drive.ParentReference{{Id: folder.Id}},
 	}
 
@@ -185,9 +185,9 @@ func (gd *GDrive) UploadFile(localFilePath string, remoteDir string) error {
 }
 
 // DownloadFile скачивает файл с Google Drive.
-func (gd *GDrive) DownloadFile(fileID string, destinationPath string) error {
+func (gd *GDrive) DownloadFile(fileID string, localPath string) error {
 	// Создание файла для записи.
-	outFile, err := os.Create(destinationPath)
+	outFile, err := os.Create(localPath)
 	if err != nil {
 		return fmt.Errorf("ошибка создания файла: %v", err)
 	}
@@ -206,19 +206,19 @@ func (gd *GDrive) DownloadFile(fileID string, destinationPath string) error {
 		return fmt.Errorf("ошибка записи файла: %v", err)
 	}
 
-	fmt.Printf("Файл успешно скачен и сохранен по пути: %s\n", destinationPath)
+	fmt.Printf("Файл успешно скачен и сохранен по пути: %s\n", localPath)
 	return nil
 }
 
 // LS выводит список файлов в указанной папке.
-func (gd *GDrive) LS(folderPath string) error {
+func (gd *GDrive) LS(remotePath string) error {
 	// Если путь пустой, устанавливаем его как корневая папка.
-	if folderPath == "" {
-		folderPath = "root"
+	if remotePath == "" {
+		remotePath = "root"
 	}
 
 	// Получение ID папки по ее пути.
-	folder, err := gd.getFolderByPath(folderPath)
+	folder, err := gd.getFolderByPath(remotePath)
 	if err != nil {
 		return fmt.Errorf("ошибка получения папки: %v", err)
 	}
@@ -231,7 +231,7 @@ func (gd *GDrive) LS(folderPath string) error {
 	}
 
 	// Вывод списка файлов.
-	fmt.Printf("Список файлов в папке %s:\n", folderPath)
+	fmt.Printf("Список файлов в папке %s:\n", remotePath)
 	for _, file := range files.Items {
 		fmt.Printf("ID: %s, Name: %s\n", file.Id, file.Title)
 	}
@@ -239,9 +239,9 @@ func (gd *GDrive) LS(folderPath string) error {
 }
 
 // getOrCreateFolder получает или создает папку по указанному пути.
-func (gd *GDrive) getOrCreateFolder(folderPath string) (*drive.File, error) {
+func (gd *GDrive) getOrCreateFolder(remotePath string) (*drive.File, error) {
 	// Разбиение пути на компоненты.
-	folders := strings.Split(folderPath, "/")
+	folders := strings.Split(remotePath, "/")
 
 	// Поиск каждой папки в пути.
 	parent := "root"
@@ -280,9 +280,9 @@ func (gd *GDrive) getOrCreateFolder(folderPath string) (*drive.File, error) {
 }
 
 // getFolderByPath получает папку по указанному пути.
-func (gd *GDrive) getFolderByPath(folderPath string) (*drive.File, error) {
+func (gd *GDrive) getFolderByPath(remotePath string) (*drive.File, error) {
 	// Разбиение пути на компоненты.
-	folders := strings.Split(folderPath, "/")
+	folders := strings.Split(remotePath, "/")
 
 	// Начало с корневой папки.
 	parent := "root"
