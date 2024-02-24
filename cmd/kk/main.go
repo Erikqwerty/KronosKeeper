@@ -26,9 +26,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = kkmanager.GDrive.NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
+
 	kkmanager.ListDir(kkmanager.RemoteStorage.GDrive, "nginx")
 }

@@ -29,11 +29,23 @@ func New(conf *config.Config) (*Kkmanager, error) {
 		Conf:   conf,
 		Logger: logrus.New(),
 	}
-	kkm.GCloud = gCloud.New(conf.RemoteStorages.GCloud.CredentialsJSON)
-	kkm.GDrive, err = gDrive.New(conf.RemoteStorages.GDrive.ApiKeyJson, conf.RemoteStorages.GDrive.TokenFile)
-	if err != nil {
-		kkm.Logger.Errorf("Ошибка при инициализации kkmanager")
-		return kkm, err
+	if conf.RemoteStorages != nil {
+		if conf.RemoteStorages.GCloud.CredentialsJSON != "" {
+			kkm.GCloud = gCloud.New(conf.RemoteStorages.GCloud.CredentialsJSON)
+			if err := kkm.GCloud.NewClient(); err != nil {
+				return kkm, err
+			}
+		}
+
+		if conf.RemoteStorages.GDrive.ApiKeyJson != "" {
+			kkm.GDrive, err = gDrive.New(conf.RemoteStorages.GDrive.ApiKeyJson, conf.RemoteStorages.GDrive.TokenFile)
+			if err != nil {
+				return kkm, err
+			}
+			if err := kkm.GDrive.NewClient(); err != nil {
+				return kkm, err
+			}
+		}
 	}
 
 	return kkm, err
