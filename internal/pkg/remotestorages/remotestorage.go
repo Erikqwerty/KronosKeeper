@@ -5,25 +5,20 @@ import (
 	"fmt"
 
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/config"
-	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorages/gCloud"
+
+	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorages/cloudStorages/gCloud"
+	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorages/cloudStorages/gDrive"
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorages/nfs"
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorages/samba"
-	gdrive "github.com/Erikqwerty/KronosKeeper/pkg/gDrive"
-	"google.golang.org/api/drive/v2"
 )
 
 // Remotestorages представляет собой структуру для работы с удаленными хранилищами.
 type Remotestorages struct {
 	UploadConfig
 	gCloud *gCloud.GCloud
-	gDrive *gdrive.GDrive
+	gDrive *gDrive.GDrive
 	smb    *samba.Samba
 	nfs    *nfs.NFS
-}
-
-type Remoter interface {
-	UploadFile(string, string) error
-	ListDirItems(string) ([]*drive.File, error)
 }
 
 // UploadConfig содержит настройки для отправки резервных копий в удаленное хранилище.
@@ -83,7 +78,7 @@ func New(UploadConfig *UploadConfig, remote *config.RemoteStorages) (*Remotestor
 	}
 
 	if remote.GDrive.ApiKeyJson != "" {
-		gDrive, err := gdrive.New(remote.GDrive.ApiKeyJson, remote.GDrive.TokenFile)
+		gDrive, err := gDrive.New(remote.GDrive.ApiKeyJson, remote.GDrive.TokenFile)
 		if err != nil {
 			return remotestorages, err
 		}

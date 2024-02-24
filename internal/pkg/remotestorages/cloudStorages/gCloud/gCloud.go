@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorages/cloudStorages"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 )
@@ -157,7 +158,7 @@ func (gc *GCloud) folderIDByPath(remotePath string) (string, error) {
 }
 
 // ListDirItems возвращает список файлов и папок в указанной папке на Google Cloud.
-func (gc *GCloud) ListDirItems(remotePath string) ([]*drive.File, error) {
+func (gc *GCloud) ListDirItems(remotePath string) ([]cloudStorages.File, error) {
 	// Получаем идентификатор папки по ее пути.
 	folderID, err := gc.folderIDByPath(remotePath)
 	if err != nil {
@@ -169,7 +170,17 @@ func (gc *GCloud) ListDirItems(remotePath string) ([]*drive.File, error) {
 	if err != nil {
 		return nil, fmt.Errorf("google Cloud API: не удалось получить список файлов и папок: %v", err)
 	}
+	var Items []cloudStorages.File
+	for _, file := range fileList.Files {
+		item := &cloudStorages.File{
+			Id:      file.Id,
+			Name:    file.Name,
+			Size:    file.Size,
+			Parents: file.Parents,
+		}
+		Items = append(Items, *item)
+	}
 
 	// Возвращаем список файлов и папок.
-	return fileList.Files, nil
+	return Items, nil
 }

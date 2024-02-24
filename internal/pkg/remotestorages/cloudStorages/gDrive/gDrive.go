@@ -1,6 +1,6 @@
 // Package gdrive предоставляет функции для взаимодействия с Google Drive API,
 // включая загрузку файлов, просмотр содержимого папок и скачивание файлов.
-package gdrive
+package gDrive
 
 import (
 	"context"
@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorages/cloudStorages"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v2"
@@ -211,7 +212,7 @@ func (gd *GDrive) DownloadFile(fileID string, localPath string) error {
 }
 
 // ListDirItems выводит список файлов в указанной папке.
-func (gd *GDrive) ListDirItems(remotePath string) ([]*drive.File, error) {
+func (gd *GDrive) ListDirItems(remotePath string) ([]cloudStorages.File, error) {
 	// Если путь пустой, устанавливаем его как корневая папка.
 	if remotePath == "" {
 		remotePath = "root"
@@ -230,7 +231,29 @@ func (gd *GDrive) ListDirItems(remotePath string) ([]*drive.File, error) {
 		return nil, fmt.Errorf("ошибка при получении списка файлов: %v", err)
 	}
 
-	return files.Items, err
+	// Вывод списка файлов.
+	var items []cloudStorages.File
+	for _, file := range files.Items {
+		// Преобразование списка родительских папок в путь.
+		var parents []string
+		for _, parent := range file.Parents {
+			// Получаем информацию о каждой родительской папке и добавляем ее имя в список.
+			parentInfo, err := gd.service.Files.Get(parent.Id).Fields("title").Do()
+			if err != nil {
+				return nil, fmt.Errorf("ошибка при получении информации о родительской папке: %v", err)
+			}
+			parents = append(parents, parentInfo.Title)
+		}
+		// Создание объекта файла с путем к родительским папкам.
+		item := &cloudStorages.File{
+			Id:      file.Id,
+			Name:    file.Title,
+			Size:    file.FileSize,
+			Parents: parents,
+		}
+		items = append(items, *item)
+	}
+	return items, err
 }
 
 // getOrCreateFolder получает или создает папку по указанному пути.
