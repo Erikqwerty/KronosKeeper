@@ -7,6 +7,12 @@ type File struct {
 	Parents []string
 }
 
+type Cloud interface {
+	Lister
+	Uploader
+	Downloader
+}
+
 type Lister interface {
 	ListDirItems(string) ([]File, error)
 }
