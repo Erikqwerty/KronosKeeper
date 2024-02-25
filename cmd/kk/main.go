@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/Erikqwerty/KronosKeeper/internal/app/manager"
@@ -27,5 +28,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	kkmanager.ListDir(kkmanager.RemoteStorage.GDrive, "nginx")
+	err = kkmanager.ListDir(kkmanager.RemoteStorage.GDrive, "testdirbackup")
+	if err != nil {
+		fmt.Println(err)
+	}
 }
