@@ -246,10 +246,11 @@ func (gd *GDrive) ListDirItems(remotePath string) ([]cloudStorages.File, error) 
 		}
 		// Создание объекта файла с путем к родительским папкам.
 		item := &cloudStorages.File{
-			Id:      file.Id,
-			Name:    file.Title,
-			Size:    file.FileSize,
-			Parents: parents,
+			Id:       file.Id,
+			Name:     file.Title,
+			Size:     file.FileSize,
+			Parents:  parents,
+			MimeType: file.MimeType,
 		}
 		items = append(items, *item)
 	}

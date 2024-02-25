@@ -173,10 +173,11 @@ func (gc *GCloud) ListDirItems(remotePath string) ([]cloudStorages.File, error) 
 	var Items []cloudStorages.File
 	for _, file := range fileList.Files {
 		item := &cloudStorages.File{
-			Id:      file.Id,
-			Name:    file.Name,
-			Size:    file.Size,
-			Parents: file.Parents,
+			Id:       file.Id,
+			Name:     file.Name,
+			Size:     file.Size,
+			Parents:  file.Parents,
+			MimeType: file.MimeType,
 		}
 		Items = append(Items, *item)
 	}

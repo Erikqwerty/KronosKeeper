@@ -1,10 +1,11 @@
 package cloudStorages
 
 type File struct {
-	Id      string
-	Name    string
-	Size    int64
-	Parents []string
+	Id       string
+	Name     string
+	Size     int64
+	Parents  []string
+	MimeType string
 }
 
 type Cloud interface {
