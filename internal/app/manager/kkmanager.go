@@ -96,14 +96,14 @@ func (kkm *Kkmanager) ListBackupsUnit(unitName string) error {
 				fmt.Print("_________________________________________________________________________________")
 				switch remote {
 				case "gDrive":
-					fmt.Printf("\nСписок бекапов на %v:\n", remote)
+					fmt.Printf("\n				Список бекапов на %v:		\n", remote)
 					fmt.Println("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾")
 					if err := kkm.listDir(kkm.GDrive, unit.RemotePath); err != nil {
 						return err
 					}
 					continue
 				case "gCloud":
-					fmt.Printf("\nСписок бекапов на %v: \n", remote)
+					fmt.Printf("\n				Список бекапов на %v:		\n", remote)
 					fmt.Println("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾")
 					if err := kkm.listDir(kkm.GCloud, unit.RemotePath); err != nil {
 						return err
