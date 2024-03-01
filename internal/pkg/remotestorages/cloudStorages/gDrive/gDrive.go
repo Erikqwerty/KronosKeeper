@@ -79,12 +79,20 @@ func (gd *GDrive) NewClient() error {
 		return nil
 	}
 
+	errChan := make(chan error)
 	// Запуск сервера аутентификации OAuth.
-	err = gd.startOAuthServer()
+	go func() {
+		err = gd.startOAuthServer()
+		if err != nil {
+			errChan <- fmt.Errorf("ошибка запуска сервера аутентификации: %v", err)
+			return
+		}
+		errChan <- nil
+	}()
+	err = <-errChan
 	if err != nil {
-		return fmt.Errorf("ошибка запуска сервера аутентификации: %v", err)
+		return err
 	}
-
 	// Создание клиента Google Drive API.
 	gd.service, err = drive.NewService(context.Background(), option.WithHTTPClient(gd.client))
 	if err != nil {

@@ -2,6 +2,7 @@ package manager
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/config"
 	"github.com/Erikqwerty/KronosKeeper/internal/pkg/remotestorages/cloudStorages"
@@ -51,6 +52,7 @@ func New(conf *config.Config) (*Kkmanager, error) {
 }
 
 func (kkm *Kkmanager) ListDir(remote cloudStorages.Lister, path string) error {
+
 	// получаем список файлов по пути path
 	files, err := remote.ListDirItems(path)
 	if err != nil {
@@ -58,16 +60,20 @@ func (kkm *Kkmanager) ListDir(remote cloudStorages.Lister, path string) error {
 	}
 	// Выводим название директории
 	fmt.Println(path + "/")
-	for _, file := range files {
-		if file.IsDir() {
-			if err := kkm.ListDir(remote, file.PathGenerate()); err != nil {
-				return fmt.Errorf("ошибка рекурсивного вывода структуры директории %v, Error: %v", file.PathGenerate(), err)
+
+	return func() error {
+		for _, file := range files {
+			if file.IsDir() {
+				path = filepath.Join(path, file.Name)
+				if err := kkm.ListDir(remote, path); err != nil {
+					return fmt.Errorf("ошибка рекурсивного вывода структуры директории %v, Error: %v", file.PathGenerate(), err)
+				}
+			} else {
+				fmt.Println("|--", file.Name)
 			}
-		} else {
-			fmt.Println("|--", file.Name)
 		}
-	}
-	return nil
+		return nil
+	}()
 }
 
 // func (kkm *Kkmanager) ListDir(remote cloudstorages.Lister, unitName string) {

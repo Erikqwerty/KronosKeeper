@@ -1,16 +1,15 @@
 package cloudStorages
 
 import (
-	"fmt"
 	"path/filepath"
 )
 
 type File struct {
-	Id       string
-	Name     string
-	Size     int64
-	Parents  []string
-	MimeType string
+	Id       string   // ID файла на диске
+	Name     string   // Имя файла
+	Size     int64    // Размер файла
+	Parents  []string // Папка вышестоящего уровня, а надо бы путь к файлу.
+	MimeType string   // Тип файла
 }
 
 type Cloud interface {
@@ -36,9 +35,7 @@ func (f *File) IsDir() bool {
 }
 
 func (f *File) PathGenerate() string {
-	fmt.Println(f.Parents)
 	var path string
-	fmt.Println("предки", f.Parents)
 	for _, item := range f.Parents {
 		path = filepath.Join(path, item)
 	}

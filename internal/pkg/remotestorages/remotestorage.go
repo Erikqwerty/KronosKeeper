@@ -113,7 +113,6 @@ func (r *Remotestorages) UploadBackups() *UploadReports {
 				UploadReports.GDrive.Err = fmt.Errorf("UploadBackups: %v", err)
 			}
 			UploadReports.GDrive.Status = true
-
 		}
 	}
 
