@@ -1,6 +1,7 @@
 package cloudStorages
 
 import (
+	"fmt"
 	"path/filepath"
 )
 
@@ -40,4 +41,18 @@ func (f *File) PathGenerate() string {
 		path = filepath.Join(path, item)
 	}
 	return filepath.Join(path, f.Name)
+}
+
+func (f *File) SizeSuffix() string {
+	size := int(f.Size)
+	if size < 1000 {
+		return fmt.Sprintf("%v байт", size)
+	}
+	if size > 1000 {
+		return fmt.Sprintf("%v Килобайт", size/1000)
+	}
+	if size > 1000000 {
+		return fmt.Sprintf("%v Мегабайт", size/1000000)
+	}
+	return ""
 }

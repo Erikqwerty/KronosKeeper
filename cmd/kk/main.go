@@ -28,7 +28,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = kkmanager.ListDir(kkmanager.RemoteStorage.GDrive, "testdirbackup")
+	err = kkmanager.ListBackupsUnit("nginx")
 	if err != nil {
 		fmt.Println(err)
 	}

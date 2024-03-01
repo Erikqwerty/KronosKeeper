@@ -104,15 +104,19 @@ func (r *Remotestorages) UploadBackups() *UploadReports {
 				continue
 			}
 			UploadReports.GCloud.Status = true
+			continue
 
 		case "gDrive":
 			if err := r.gDrive.NewClient(); err != nil {
 				UploadReports.GDrive.Err = fmt.Errorf("UploadBackups: %v", err)
+				continue
 			}
 			if err := r.gDrive.UploadFile(r.LocalPath, r.RemotePath); err != nil {
 				UploadReports.GDrive.Err = fmt.Errorf("UploadBackups: %v", err)
+				continue
 			}
 			UploadReports.GDrive.Status = true
+			continue
 		}
 	}
 
